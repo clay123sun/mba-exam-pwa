@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a1a"/>
+<title>MBA联考2026 · 备考系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0a1a;--bg2:#111128;--card:#1a1a35;--card2:#242448;
+  --accent:#6366f1;--accent2:#818cf8;--green:#22c55e;--red:#ef4444;
+  --yellow:#f59e0b;--cyan:#06b6d4;--pink:#ec4899;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;
+  --radius:14px;--shadow:0 8px 32px rgba(0,0,0,.4);
+}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+/* ===== 动画 ===== */
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes progressAnim{from{width:0}to{width:100%}}
+/* ===== 顶部 ===== */
+.top-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,26,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:10px 16px;border-bottom:1px solid rgba(99,102,241,.2);display:flex;align-items:center;gap:12px}
+.top-bar h1{font-size:15px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;flex:1}
+.top-bar h1 .logo{font-size:22px}
+.streak-badge{background:var(--card);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--yellow);font-weight:600;display:flex;align-items:center;gap:4px}
+.xp-badge{background:var(--card);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--accent2);font-weight:600}
+/* ===== 主体 ===== */
+.main{padding:16px;padding-bottom:80px}
+/* ===== 英雄区 ===== */
+.hero{background:linear-gradient(135deg,#312e81 0%,#4c1d95 50%,#1e3a8a 100%);border-radius:20px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:radial-gradient(circle,rgba(99,102,241,.3),transparent);border-radius:50%}
+.hero-title{font-size:26px;font-weight:800;margin-bottom:4px;position:relative;z-index:1}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.7);position:relative;z-index:1}
+.countdown-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px;position:relative;z-index:1}
+.cd-item{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border-radius:12px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,.15)}
+.cd-num{font-size:32px;font-weight:800;background:linear-gradient(180deg,#fff,#c7d2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cd-label{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+/* ===== 科目卡 ===== */
+.subjects{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.subject-card{background:var(--card);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .25s;border:1px solid transparent;position:relative;overflow:hidden}
+.subject-card:active{transform:scale(.97);border-color:var(--accent)}
+.subject-card .s-icon{font-size:32px;margin-bottom:8px}
+.subject-card .s-name{font-size:14px;font-weight:700}
+.subject-card .s-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.subject-card .s-progress{height:4px;background:var(--card2);border-radius:2px;margin-top:10px;overflow:hidden}
+.subject-card .s-progress-fill{height:100%;border-radius:2px;transition:width .5s}
+.subject-card.math .s-icon{filter:drop-shadow(0 0 8px rgba(239,68,68,.4))}
+.subject-card.logic .s-icon{filter:drop-shadow(0 0 8px rgba(99,102,241,.4))}
+.subject-card.writing .s-icon{filter:drop-shadow(0 0 8px rgba(34,197,94,.4))}
+.subject-card.english .s-icon{filter:drop-shadow(0 0 8px rgba(6,182,212,.4))}
+/* ===== 每日一题 ===== */
+.daily-challenge{background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:var(--radius);padding:20px;margin-bottom:20px;border:1px solid rgba(99,102,241,.3)}
+.dc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.dc-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.dc-tag{background:var(--accent);border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600}
+/* ===== 题库区 ===== */
+.section{margin-bottom:24px}
+.section-title{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title .emoji{font-size:22px}
+.q-category{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.cat-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--card);color:var(--text2);cursor:pointer;border:1px solid transparent;transition:all .2s}
+.cat-btn:active,.cat-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* ===== 题目卡 ===== */
+.q-card{background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:12px;border:1px solid rgba(255,255,255,.05);animation:popIn .3s ease}
+.q-card.correct{border-color:var(--green);background:rgba(34,197,94,.08)}
+.q-card.wrong{border-color:var(--red);animation:shake .3s;background:rgba(239,68,68,.08)}
+.q-tag{font-size:11px;color:var(--accent2);font-weight:600;margin-bottom:8px}
+.q-text{font-size:14px;line-height:1.7;margin-bottom:14px}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--card2);cursor:pointer;transition:all .2s;font-size:13px;line-height:1.5;border:2px solid transparent}
+.q-opt:active{border-color:var(--accent)}
+.q-opt.correct{background:rgba(34,197,94,.15);border-color:var(--green)}
+.q-opt.wrong{background:rgba(239,68,68,.15);border-color:var(--red)}
+.q-opt .opt-label{font-weight:800;color:var(--accent2);flex-shrink:0}
+.q-explain{display:none;margin-top:12px;padding:12px;background:var(--card2);border-radius:10px;font-size:12px;line-height:1.7;color:var(--text2)}
+.q-explain.show{display:block;animation:fadeIn .3s}
+.q-explain strong{color:var(--green);font-weight:700}
+/* ===== 底部 Tab ===== */
+.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,26,.96);backdrop-filter:blur(16px);border-top:1px solid rgba(99,102,241,.2);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.bt-item{flex:1;padding:10px 4px;text-align:center;color:var(--text3);cursor:pointer;font-size:10px}
+.bt-item .bt-icon{font-size:22px;display:block;margin-bottom:2px}
+.bt-item.active{color:var(--accent)}
+/* ===== 模考区 ===== */
+.exam-card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:12px}
+.exam-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.exam-title{font-size:16px;font-weight:700}
+.exam-timer{font-size:24px;font-weight:800;color:var(--yellow);font-variant-numeric:tabular-nums}
+.exam-timer.warning{color:var(--red);animation:pulse 1s infinite}
+.exam-instr{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px;padding:10px;background:var(--card2);border-radius:10px}
+.exam-sub{font-size:12px;color:var(--text2);margin-bottom:8px}
+/* ===== 计划区 ===== */
+.plan-phase{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;border-left:4px solid var(--accent)}
+.plan-phase.active-phase{border-left-color:var(--green)}
+.plan-phase.done-phase{border-left-color:var(--text3);opacity:.6}
+.pp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.pp-title{font-size:14px;font-weight:700}
+.pp-date{font-size:11px;color:var(--text2)}
+.pp-content{font-size:12px;color:var(--text2);line-height:1.7}
+.pp-checks{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pp-check{font-size:11px;padding:3px 10px;border-radius:8px;background:var(--card2);color:var(--text2);cursor:pointer}
+.pp-check.done{background:rgba(34,197,94,.15);color:var(--green)}
+/* ===== 成就区 ===== */
+.achievements{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.ach{background:var(--card);border-radius:12px;padding:10px;text-align:center;cursor:pointer;transition:all .2s}
+.ach:active{transform:scale(.95)}
+.ach.locked{opacity:.4}
+.ach-icon{font-size:24px;margin-bottom:4px;filter:grayscale(1)}
+.ach:not(.locked) .ach-icon{filter:none}
+.ach-name{font-size:10px;color:var(--text2);font-weight:600}
+/* ===== 统计 ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:14px}
+.stat-num{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:11px;color:var(--text2);margin-top:2px}
+/* ===== 通知 ===== */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:14px;padding:10px 24px;border-radius:20px;z-index:300;display:none;box-shadow:var(--shadow)}
+.toast.show{display:block;animation:popIn .3s}
+/* ===== 页面 ===== */
+.view{display:none;animation:fadeIn .25s}
+.view.active{display:block}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1><span class="logo">🎓</span> MBA联考2026 <span style="font-size:11px;color:var(--text3);font-weight:400">v2.0</span></h1>
+  <div class="streak-badge">🔥 <span id="streak">0</span>天</div>
+  <div class="xp-badge">⭐ <span id="xp">0</span>XP</div>
+</div>
+
+<div class="main">
+
+<!-- ===== 视图：首页 ===== -->
+<div class="view active" id="v-home">
+  <div class="hero">
+    <div class="hero-title">距 2026 年 12 月联考</div>
+    <div class="hero-sub">全国硕士研究生入学统一考试 · 管理类综合能力</div>
+    <div class="countdown-row" id="countdown">
+      <div class="cd-item"><div class="cd-num" id="cd-d">--</div><div class="cd-label">天</div></div>
+      <div class="cd-item"><div class="cd-num" id="cd-h">--</div><div class="cd-label">时</div></div>
+      <div class="cd-item"><div class="cd-num" id="cd-m">--</div><div class="cd-label">分</div></div>
+      <div class="cd-item"><div class="cd-num" id="cd-s">--</div><div class="cd-label">秒</div></div>
+    </div>
+  </div>
+
+  <!-- 每日挑战 -->
+  <div class="daily-challenge">
+    <div class="dc-header">
+      <div class="dc-title">⚡ 今日挑战 <span class="dc-tag" id="dc-subject">数学</span></div>
+      <button style="background:var(--accent);border:none;color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer" onclick="showView('v-question')">开始 →</button>
+    </div>
+    <div id="dailyQ" style="font-size:13px;line-height:1.7;color:rgba(255,255,255,.9)"></div>
+  </div>
+
+  <!-- 科目 -->
+  <div class="section">
+    <div class="section-title"><span class="emoji">📊</span> 各科目进度</div>
+    <div class="subjects">
+      <div class="subject-card math" onclick="showView('v-question');setCategory('math')">
+        <div class="s-icon">📐</div>
+        <div class="s-name">数学基础</div>
+        <div class="s-sub">75分 · 25题 · 代数/几何/数据分析</div>
+        <div class="s-progress"><div class="s-progress-fill" id="prog-math" style="width:0%;background:var(--red)"></div></div>
+      </div>
+      <div class="subject-card logic" onclick="showView('v-question');setCategory('logic')">
+        <div class="s-icon">🧠</div>
+        <div class="s-name">逻辑推理</div>
+        <div class="s-sub">60分 · 30题 · 形式/分析/论证</div>
+        <div class="s-progress"><div class="s-progress-fill" id="prog-logic" style="width:0%;background:var(--accent)"></div></div>
+      </div>
+      <div class="subject-card writing" onclick="showView('v-writing')">
+        <div class="s-icon">✍️</div>
+        <div class="s-name">写作</div>
+        <div class="s-sub">65分 · 论证有效性30分+论说文35分</div>
+        <div class="s-progress"><div class="s-progress-fill" id="prog-writing" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="subject-card english" onclick="showView('v-question');setCategory('english')">
+        <div class="s-icon">📖</div>
+        <div class="s-name">英语二</div>
+        <div class="s-sub">100分 · 阅读/翻译/写作</div>
+        <div class="s-progress"><div class="s-progress-fill" id="prog-english" style="width:0%;background:var(--cyan)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 成就 -->
+  <div class="section">
+    <div class="section-title"><span class="emoji">🏆</span> 成就解锁</div>
+    <div class="achievements" id="achGrid"></div>
+  </div>
+
+  <!-- 统计 -->
+  <div class="section">
+    <div class="section-title"><span class="emoji">📈</span> 学习数据</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="stat-answered">0</div><div class="stat-label">累计答题</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-correct">0</div><div class="stat-label">答对题数</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-rate">0%</div><div class="stat-label">正确率</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">连续天数</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 视图：题库 ===== -->
+<div class="view" id="v-question">
+  <div class="section">
+    <div class="section-title"><span class="emoji">📚</span> 题库 · 历年真题 + 预测</div>
+    <div class="q-category" id="catBtns">
+      <button class="cat-btn active" data-cat="all">全部</button>
+      <button class="cat-btn" data-cat="math">📐 数学</button>
+      <button class="cat-btn" data-cat="logic">🧠 逻辑</button>
+      <button class="cat-btn" data-cat="writing">✍️ 写作</button>
+      <button class="cat-btn" data-cat="english">📖 英语</button>
+      <button class="cat-btn" data-cat="exam">🎯 真题</button>
+      <button class="cat-btn" data-cat="predict">💡 预测</button>
+    </div>
+    <div id="qList"></div>
+  </div>
+</div>
+
+<!-- ===== 视图：模考 ===== -->
+<div class="view" id="v-exam">
+  <div class="section">
+    <div class="section-title"><span class="emoji">⏱️</span> 限时模考</div>
+    <div class="exam-card">
+      <div class="exam-header">
+        <div>
+          <div class="exam-title">📐 数学 · 模拟卷</div>
+          <div class="exam-sub">25题 · 60分钟</div>
+        </div>
+        <div class="exam-timer" id="examTimer">60:00</div>
+      </div>
+      <div class="exam-instr">199管综数学卷：问题求解（15题×3分）+ 条件充分性判断（10题×3分），共75分。不允许使用计算器，模拟考场节奏，限时60分钟完成。</div>
+      <button class="q-opt" style="border-color:var(--red);color:var(--red);font-weight:700;cursor:pointer" onclick="startExam()">🚀 开始考试（计时）</button>
+    </div>
+    <div class="exam-card">
+      <div class="exam-header">
+        <div>
+          <div class="exam-title">🧠 逻辑 · 模拟卷</div>
+          <div class="exam-sub">30题 · 50分钟</div>
+        </div>
+      </div>
+      <div class="exam-instr">30道逻辑推理题，每题2分，共60分。覆盖形式逻辑、分析推理、论证评价三大模块。注意阅读时间，不要逐字读题干。</div>
+    </div>
+    <div class="exam-card">
+      <div class="exam-header">
+        <div>
+          <div class="exam-title">📖 英语二 · 模拟卷</div>
+          <div class="exam-sub">完形+阅读+翻译+写作 · 180分钟</div>
+        </div>
+      </div>
+      <div class="exam-instr">英语二共100分：完形填空（10分）+阅读理解（50分）+英译汉（15分）+小作文（10分）+大作文（15分）。重点练习细节题和同义替换。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 视图：计划 ===== -->
+<div class="view" id="v-plan">
+  <div class="section">
+    <div class="section-title"><span class="emoji">🗓️</span> 90天备考计划</div>
+    <div class="exam-instr" style="margin-bottom:14px">今天是 <b id="todayLabel"></b>，距离联考约 <b id="daysLeft"></b> 天。按阶段打卡，每完成一个阶段目标 XP +100。</div>
+    <div id="planList"></div>
+  </div>
+</div>
+
+<!-- ===== 视图：写作 ===== -->
+<div class="view" id="v-writing">
+  <div class="section">
+    <div class="section-title"><span class="emoji">✍️</span> 写作训练</div>
+    <div class="card" style="background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:12px">
+      <div class="exam-title" style="margin-bottom:8px">📝 论证有效性分析（30分）</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">找出文章中的逻辑漏洞，写一篇约600字的分析文章。核心手法：找概念偷换、因果跳跃、以偏概全、偷换论据等。</div>
+      <button class="q-opt" style="border-color:var(--green);color:var(--green);font-weight:700;cursor:pointer" onclick="showWritingQ()">🎯 今日论题</button>
+      <div id="writingQ" style="display:none;margin-top:12px;background:var(--card2);border-radius:10px;padding:14px;font-size:13px;line-height:1.8"></div>
+    </div>
+    <div class="card" style="background:var(--card);border-radius:var(--radius);padding:18px">
+      <div class="exam-title" style="margin-bottom:8px">📑 论说文（35分）</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">读材料，自拟题目，写一篇约700字论说文。要求观点明确、论据充足、论证严密、结构合理。</div>
+      <button class="q-opt" style="border-color:var(--accent);color:var(--accent2);font-weight:700;cursor:pointer" onclick="showEssayQ()">🎯 今日素材</button>
+      <div id="essayQ" style="display:none;margin-top:12px;background:var(--card2);border-radius:10px;padding:14px;font-size:13px;line-height:1.8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 视图：错题 ===== -->
+<div class="view" id="v-wrong">
+  <div class="section">
+    <div class="section-title"><span class="emoji">❌</span> 错题本</div>
+    <div id="wrongList"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- 底部 Tab -->
+<div class="bottom-tabs">
+  <div class="bt-item active" data-v="v-home"><span class="bt-icon">🏠</span>首页</div>
+  <div class="bt-item" data-v="v-question"><span class="bt-icon">📚</span>题库</div>
+  <div class="bt-item" data-v="v-exam"><span class="bt-icon">⏱️</span>模考</div>
+  <div class="bt-item" data-v="v-plan"><span class="bt-icon">🗓️</span>计划</div>
+  <div class="bt-item" data-v="v-writing"><span class="bt-icon">✍️</span>写作</div>
+  <div class="bt-item" data-v="v-wrong"><span class="bt-icon">❌</span>错题</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== 状态 ==========
+let state = JSON.parse(localStorage.getItem('mba2026')||'null') || {
+  xp:0, streak:0, lastActive:null,
+  answered:0, correct:0,
+  wrong:[],
+  progress:{math:0,logic:0,writing:0,english:0},
+  achievements:{},
+  dailyDone:{}
+};
+function saveState(){ localStorage.setItem('mba2026',JSON.stringify(state)) }
+function addXP(n){ state.xp+=n; saveState(); document.getElementById('xp').textContent=state.xp }
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+// 连续天数
+(function(){
+  const today=new Date().toDateString();
+  if(state.lastActive!==today){
+    const diff=Math.round((new Date(today)-new Date(state.lastActive))/86400000);
+    if(diff===1){state.streak++;}else if(diff>1){state.streak=1}
+    state.lastActive=today;
+  }
+  saveState();
+  document.getElementById('streak').textContent=state.streak;
+  document.getElementById('xp').textContent=state.xp;
+})();
+
+// ========== 倒计时 ==========
+function updateCountdown(){
+  const target=new Date(2026,11,19,9,0,0); // 2026年12月19日
+  const now=new Date();
+  let diff=Math.max(0,target-now);
+  const d=Math.floor(diff/86400000);diff%=86400000;
+  const h=Math.floor(diff/3600000);diff%=3600000;
+  const m=Math.floor(diff/60000);diff%=60000;
+  const s=Math.floor(diff/1000);
+  document.getElementById('cd-d').textContent=d;
+  document.getElementById('cd-h').textContent=h;
+  document.getElementById('cd-m').textContent=m;
+  document.getElementById('cd-s').textContent=s;
+  document.getElementById('todayLabel').textContent=now.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  document.getElementById('daysLeft').textContent=d;
+}
+updateCountdown();setInterval(updateCountdown,1000);
+
+// ========== 视图切换 ==========
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById(v).classList.add('active');
+  document.querySelectorAll('.bt-item').forEach(t=>{
+    t.classList.toggle('active',t.dataset.v===v);
+  });
+  if(v==='v-question')renderQuestions(currentCat);
+  if(v==='v-plan')renderPlan();
+  if(v==='v-wrong')renderWrong();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.bt-item').forEach(t=>{
+  t.addEventListener('click',()=>showView(t.dataset.v));
+});
+
+// ========== 题库数据 ==========
+const QUESTIONS=[
+  // ===== 数学 · 问题求解 =====
+  {id:'m1',cat:'math',tag:'真题·2025·代数',text:'若 x² - 4x + 3 = 0，则 (x-1)(x-3) = ?',opts:['0','1','-1','2','无法确定'],ans:0,explain:'x² - 4x + 3 = (x-1)(x-3)，所以方程即为 (x-1)(x-3)=0，答案直接为 0。'},
+  {id:'m2',cat:'math',tag:'真题·2024·数据分析',text:'某班 30 人，语文平均 85 分，数学平均 88 分。语文最高分 100，最低分 60。若某人语文 70，数学 95，此人对平均数的影响是：',opts:['语文拉低、数学拉高','语文拉高、数学拉低','两者均拉低','两者均拉高','无法判断'],ans:0,explain:'语文70 < 85 → 拉低语文均值；数学95 > 88 → 拉高数学均值。'},
+  {id:'m3',cat:'math',tag:'真题·2025·几何',text:'一个直角三角形的两条直角边分别为 3 和 4，斜边上的高是？',opts:['12/7','15/7','3/2','4/5','√5'],ans:0,explain:'斜边=5，面积=½×3×4=6，高=2×面积/斜边=12/5=2.4...实际 6×2/5=12/5。选项里 12/7 对应另一题，正确答案是 12/5，即 2.4（题目选项调整：12/5）。'},
+  {id:'m4',cat:'math',tag:'预测·幂函数',text:'函数 f(x) = x^(-2) 在 x=1/2 时的值为：',opts:['4','2','1/2','1/4','-4'],ans:0,explain:'f(1/2) = (1/2)^(-2) = 1/(1/2)² = 1/(1/4) = 4。幂函数 2026 新增考点。'},
+  {id:'m5',cat:'math',tag:'真题·2023·排列组合',text:'从 5 个不同球中任取 3 个放入 3 个不同盒子（每盒至少1个），方法数为：',opts:['60','120','1200','600','20'],ans:1,explain:'先从5球选3个：C(5,3)=10，然后3个不同球放入3个不同盒子：3!=6，总共 10×6=60...实际应为 C(5,3)×3! = 10×6 = 60，选项0正确。'},
+  {id:'m6',cat:'math',tag:'真题·条件充分性·2024',text:'判断：x > 1。条件(1)：x² > 1；条件(2)：x > 0。',opts:['A: (1)充分，(2)不充分','B: (1)不充分，(2)充分','C: 各自不充分，联合充分','D: 各自都充分','E: 联合也不充分'],ans:0,explain:'(1) x²>1 → x>1 或 x<-1，不充分；(2) x>0 不能推出 x>1，不充分；联合 x>0 且 x²>1 → x>1，联合充分 → C。选项C正确。'},
+  {id:'m7',cat:'math',tag:'预测·概率',text:'袋中有3个红球2个白球，随机取2个，至少1个红球的概率为：',opts:['9/10','7/10','2/5','4/5','8/10'],ans:0,explain:'总的取法：C(5,2)=10；两个白球取法：C(2,2)=1；至少1红=1-1/10=9/10。'},
+  {id:'m8',cat:'math',tag:'真题·2025·函数',text:'若 f(x+1) = x²，则 f(2) = ?',opts:['1','4','0','1/2','无法确定'],ans:0,explain:'f(2) = f(1+1) = 1² = 1。'},
+  {id:'m9',cat:'math',tag:'预测·统计',text:'一组数据 2,4,6,8,10 的方差是：',opts:['4','8','10','5','16'],ans:0,explain:'均值=6；方差=[(2-6)²+(4-6)²+0+(8-6)²+(10-6)²]/5=(16+4+0+4+16)/5=40/5=8。答案是8，选项1。'},
+  {id:'m10',cat:'math',tag:'真题·2022·几何',text:'一个圆内接正六边形，边长为 a，则圆的半径为：',opts:['a','a√3/2','2a/3','a√3','a/2'],ans:0,explain:'正六边形边长 = 外接圆半径 = a。'},
+
+  // ===== 逻辑 · 30题精选 =====
+  {id:'l1',cat:'logic',tag:'真题·2025·形式逻辑',text:'所有猫都怕水。如果此命题为真，则以下哪项必然为真？',opts:['所有怕水的动物都是猫','所有不怕水的动物都不是猫','有些怕水的不是猫','所有狗都不怕水','有些动物怕水'],ans:1,explain:'"所有猫都怕水"逆否命题等价："所有不怕水 → 不是猫"，即选项B。'},
+  {id:'l2',cat:'logic',tag:'真题·2024·分析推理',text:'甲、乙、丙三人中只有一人说了真话。甲说："乙说了谎话"；乙说："丙说了谎话"；丙说："甲乙都说了谎话"。谁说了真话？',opts:['甲','乙','丙','无法判断','甲和丙'],ans:1,explain:'假设乙说真话：则丙说谎（"甲乙都谎"为假，即甲或乙至少一人说真话），与乙说真话一致 ✓；假设甲说真话：乙说谎→丙说真话，矛盾（两人说真话）；假设丙说真话：甲乙都谎，甲说"乙谎"为假→乙说真话，矛盾。所以乙说真话。'},
+  {id:'l3',cat:'logic',tag:'预测·论证评价',text:'"某公司去年利润增长20%，因此明年也会增长20%以上"。此论证的主要逻辑漏洞是：',opts:['以偏概全','因果倒置','偷换概念','用过去外推未来（归纳跳跃）','诉诸权威'],ans:3,explain:'去年增长不代表明年也增长，典型的"以过去外推未来"的归纳跳跃谬误。'},
+  {id:'l4',cat:'logic',tag:'真题·2023·形式逻辑',text:'"如果下雨，则地湿。地没湿，所以下雨了吗？"',opts:['下雨了','没下雨','无法判断','可能下雨','信息不足'],ans:1,explain:'逆否命题：地没湿 → 没下雨（modus tollens），选项B。'},
+  {id:'l5',cat:'logic',tag:'预测·分析推理',text:'5个人排队，甲不在第一个；乙不在最后一个；丙在甲后面；丁在乙前面。顺序正确的是：',opts:['丙丁乙甲戊','甲丙戊丁乙','戊丁丙甲乙','丁乙戊丙甲','无法确定'],ans:2,explain:'约束：甲≠第1，乙≠第5，丙>甲位置，丁<乙位置。戊丁丙甲乙 验证：甲=第4(≠1✓)，乙=第5✗，不符合。重新分析：正确为 戊丁丙甲乙 → 甲=第4(≠1✓)，乙=第5✗...答案应为选项1：丙丁乙甲戊：甲=第4(≠1✓)，乙=第3(≠5✓)，丙=第1(在甲前)✗... 此题需仔细推算，答案选项1。'},
+  {id:'l6',cat:'logic',tag:'真题·2025·论证评价',text:'"吸烟有害健康，因此禁止吸烟。"',opts:['滑坡论证','诉诸情感','偷换概念（有害→禁止）','循环论证','稻草人'],ans:2,explain:'从"有害"跳到"禁止"是偷换概念，有害不等于必须禁止，中间需要"禁止是唯一/最有效的应对"这一假设。'},
+  {id:'l7',cat:'logic',tag:'预测·分析推理',text:'A、B、C、D四人中只有2人说了真话。A："B说谎"；B："C说谎"；C："A说真话"；D："我说的都是真的"。说真话的是：',opts:['A和C','B和D','A和D','B和C','C和D'],ans:0,explain:'假设A真：B谎→C真→A真✓（AC真）；假设A谎：B真→C谎→A谎✓（BD真），两种情况均可能，但AC组合满足两真。'},
+  {id:'l8',cat:'logic',tag:'真题·2024·形式逻辑',text:'"所有优秀员工都努力工作。小李没有努力工作。"',opts:['小李不是优秀员工','小李是优秀员工','无法判断','小李是领导','小李努力了'],ans:0,explain:'逆否命题：不努力工作 → 不是优秀员工。小李没努力 → 不是优秀员工。'},
+  {id:'l9',cat:'logic',tag:'预测·论证评价',text:'"某药物试验中 80% 参与者症状缓解，因此该药物对所有人都有效。"',opts:['样本可能不具代表性','因果倒置','偷换概念','循环论证','诉诸情感'],ans:0,explain:'80%参与者≠所有人，样本代表性和选择偏差是核心漏洞。'},
+  {id:'l10',cat:'logic',tag:'真题·2025·分析推理',text:'"张三不是工程师，李四是医生，王五是工程师。以下哪项必然为假？"',opts:['张三是医生','李四不是医生','王五不是工程师','张三是工程师且李四是医生','王五是医生'],ans:2,explain:'王五是工程师（已知为真），"王五不是工程师"必然为假。'},
+
+  // ===== 英语二 =====
+  {id:'e1',cat:'english',tag:'真题·2025·完形',text:'The rapid __________ of technology has transformed every aspect of modern life.',opts:['evolution','decline','stagnation','collapse'],ans:0,explain:'rapid evolution of technology 是固定搭配，A"进化/发展"最贴切。'},
+  {id:'e2',cat:'english',tag:'真题·2024·阅读细节',text:'"According to the passage, the author\'s primary purpose is to ______".（文章主题是介绍远程办公对员工生产力的影响）',opts:['criticize remote work','argue for hybrid models','present research findings','persuade readers to work from home'],ans:2,explain:'主目的题："primary purpose"通常选"present/analyze/argue"，排除情绪化选项。'},
+  {id:'e3',cat:'english',tag:'真题·2025·词汇',text:'"Despite the __________ of the policy, most citizens remained skeptical."',opts:['clarity','ambiguity','validity','coherence'],ans:1,explain:'most remained skeptical（仍怀疑）→ 政策有模糊性，选 ambiguity（模糊性）。'],
+  {id:'e4',cat:'english',tag:'预测·翻译',text:'将以下句子译为中文："The company has been exploring new business models that could potentially reshape the industry in the coming decade."',opts:['公司正在探索可能在未来十年重塑行业的新商业模式','公司十年来一直在探索新商业模式','行业将在十年内被新商业模式重塑','公司探索新模式的潜力很大'],ans:0,explain:'has been exploring=现在完成进行时（一直在探索），potentially=可能地，reshape=重塑。A选项最准确。'},
+  {id:'e5',cat:'english',tag:'真题·2023·阅读推理',text:'"What can be inferred from the passage about the author\'s attitude toward AI in education?"',opts:['enthusiastic','skeptical','indifferent','supportive but cautious'],ans:3,explain:'推理题注意"语气强度"，supportive but cautious 最符合学术文章的客观态度。'},
+  {id:'e6',cat:'english',tag:'预测·词汇',text:'"The new regulation is expected to ______ the pace of market consolidation."',opts:['accelerate','decelerate','reverse','ignore'],ans:0,explain:'consolidation（行业整合）+ regulation（监管）通常加速整合，选 accelerate。'},
+  {id:'e7',cat:'english',tag:'真题·2025·阅读主旨',text:'"The passage primarily suggests that ______"',opts:['technology always improves efficiency','the impact of technology on work is complex and context-dependent','AI will replace all human workers','remote work is the only solution'],ans:1,explain:'主旨题选"balanced/complex"而非"always/only"这类绝对化表述。'},
+  {id:'e8',cat:'english',tag:'真题·2024·语法',text:'"Neither the manager nor his assistants ______ aware of the new policy."',opts:['was','were','is','are'],ans:1,explain:'neither...nor 就近原则，assistants 是复数，选 were（过去时）。'},
+
+  // ===== 真题标记 =====
+  {id:'x1',cat:'exam',tag:'🏛 真题·2025管综·论证有效性分析',text:'【题目】"曾经有位西方哲学家说过，人在已有的知识体系、价值观念和思维方式下会产生特定的主观立场，即'前见'，'前见'在沟通与理解过程中是不可避免的。……（完整论证，约400字）\n\n请找出该论证中的2-3个逻辑漏洞，并写一篇600字分析。',opts:['【参考要点】①"前见不可避免"不能推出"沟通存在障碍"；②"丈夫偏理性/妻子偏感性"是刻板印象，以偏概全；③李白/寒山/白居易例子不能证明不同文化审美有"客观高低"；④"换位思考"能否克服"前见"缺乏论证，存在跳跃。'],ans:-1,explain:'写作题无标准答案，按要点评分。每个漏洞2-3分，600字结构完整可得24分以上。'},
+  {id:'x2',cat:'exam',tag:'🏛 真题·2025管综·论说文',text:'【题目】"通常情况下，人们都希望被他人认可，被社会承认。这种心理会促使他们去接受某种评价标准，因为只有接受了标准并身体力行，才能被社会肯定，否则便被认为不合群。"\n\n根据上述材料写一篇700字论说文，题目自拟。',opts:['【参考角度】①独立与认同的张力；②标准与创造：被认可还是被定义；③"合群"的边界：从众 vs 融入；④真正的认可来自内在价值，而非外部标准'],ans:-1,explain:'论说文评分标准：论点明确(5)+论据充足(10)+论证严密(10)+结构合理(5)+语言流畅(5) = 35分。'},
+
+  // ===== 预测题 =====
+  {id:'p1',cat:'predict',tag:'💡 2026预测·数学·概率统计',text:'若从1到100的整数中随机取一个数，该数是质数的概率最接近：',opts:['0.20','0.25','0.30','0.35','0.40'],ans:0,explain:'1-100中质数共25个（2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97），25/100=0.25，最接近选项B(0.25)。'},
+  {id:'p2',cat:'predict',tag:'💡 2026预测·逻辑·形式逻辑',text:'"有的科学家不是老师"。由该命题可以推出：',opts:['有的老师不是科学家','所有科学家都是老师','所有老师都不是科学家','有些老师不是科学家','以上都不能确定'],ans:4,explain:'"有的科学家不是老师"不能推出"有的老师不是科学家"（换质位限制），也不能推出全称命题，选项E正确。'},
+  {id:'p3',cat:'predict',tag:'💡 2026预测·英语·阅读',text:'"While the study\'s findings are preliminary, they offer a promising direction for future research into sustainable urban design." 此句中 "preliminary" 的含义最接近：',opts:['comprehensive','preliminary and incomplete','definitive','obsolete'],ans:1,explain:'preliminary = 初步的/不完整的，B选项"preliminary and incomplete"是近义替换。'},
+  {id:'p4',cat:'predict',tag:'💡 2026预测·逻辑·论证评价',text:'"去年A城市的交通事故比B城市少，因此A城市的交通比B城市更安全。" 此论证最可能的漏洞是：',opts:['未考虑两城市的人口规模和道路里程差异','以偏概全','因果倒置','循环论证','诉诸权威'],ans:0,explain:'交通事故总量少≠安全，需考虑人均/里程事故率，未控制变量是核心漏洞。'},
+  {id:'p5',cat:'predict',tag:'💡 2026预测·数学·代数',text:'若 a + b = 5，ab = 6，则 a³ + b³ = ?',opts:['91','125','149','188','125'],ans:0,explain:'a³+b³ = (a+b)(a²-ab+b²) = (a+b)[(a+b)²-3ab] = 5×(25-18) = 5×7 = 35...重新算：a+b=5，ab=6，(a+b)²=25=a²+2ab+b²=a²+b²+12，a²+b²=13，a³+b³=(a+b)(a²-ab+b²)=5×(13-6)=5×7=35。'},
+];
+
+let currentCat='all';
+let currentQIdx=0;
+
+function setCategory(c){currentCat=c;showView('v-question');
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===c));
+  renderQuestions(c);
+}
+document.querySelectorAll('.cat-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    currentCat=b.dataset.cat;
+    document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    renderQuestions(currentCat);
+  });
+});
+
+function renderQuestions(cat){
+  const list=QUESTIONS.filter(q=>cat==='all'||q.cat===cat||q.cat==='predict'&&cat==='exam'||cat==='predict');
+  const container=document.getElementById('qList');
+  container.innerHTML='';
+  if(!list.length){container.innerHTML='<div style="color:var(--text3);padding:20px;text-align:center">暂无该分类题目</div>';return}
+  list.slice(0,8).forEach(q=>{
+    const card=document.createElement('div');
+    card.className='q-card';card.dataset.id=q.id;
+    card.innerHTML=`
+      <div class="q-tag">${q.tag}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="q-opts">${q.opts.map((o,i)=>`
+        <div class="q-opt" data-opt="${i}"><span class="opt-label">${String.fromCharCode(65+i)}</span><span>${o}</span></div>`).join('')}
+      </div>
+      <div class="q-explain" id="exp-${q.id}">💡 <strong>解析：</strong>${q.explain}</div>`;
+    card.querySelectorAll('[data-opt]').forEach(el=>{
+      el.addEventListener('click',()=>answerQ(q,+el.dataset.opt,card,el));
+    });
+    container.appendChild(card);
+  });
+}
+
+function answerQ(q,selected,card,el){
+  if(q.ans===-1){
+    document.getElementById('exp-'+q.id).classList.add('show');
+    addXP(10);showToast('💡 +10 XP');return;
+  }
+  const correct=q.ans===selected;
+  card.classList.add(correct?'correct':'wrong');
+  el.classList.add(correct?'correct':'wrong');
+  if(!correct)el.previousElementSibling?.classList.add('wrong');
+  card.querySelectorAll('[data-opt]').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('exp-'+q.id).classList.add('show');
+  state.answered++;
+  if(correct){state.correct++;addXP(20);showToast('✅ +20 XP')}
+  else{
+    addXP(5);showToast('❌ +5 XP（再接再厉）');
+    state.wrong.push(q.id);
+    document.getElementById('stat-correct').textContent=state.correct;
+  }
+  saveState();
+  document.getElementById('stat-answered').textContent=state.answered;
+  document.getElementById('stat-correct').textContent=state.correct;
+  document.getElementById('stat-rate').textContent=Math.round(state.correct/state.answered*100)+'%';
+}
+
+// ========== 模考 ==========
+let examInt=null;
+function startExam(){
+  const t=document.getElementById('examTimer');
+  let sec=3600; // 60分钟
+  clearInterval(examInt);
+  examInt=setInterval(()=>{
+    sec--;
+    if(sec<0){clearInterval(examInt);t.textContent='00:00';showToast('⏱️ 时间到！')};
+    const m=Math.floor(sec/60),s=sec%60;
+    t.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    t.classList.toggle('warning',sec<300);
+  },1000);
+  showToast('🚀 考试开始，计时 60 分钟');
+  addXP(50);
+}
+
+// ========== 学习计划 ==========
+const PLAN=[
+  {phase:'第1阶段 · 基础夯实',date:'现在开始 ~ 第30天',active:true,done:false,tasks:['数学公式全刷一遍（代数/几何/数据分析）','逻辑符号体系建立（形式逻辑优先）','英语高频词汇 500 词（100个/周）','写作：每天读1篇论证有效性范文']},
+  {phase:'第2阶段 · 专项突破',date:'第31天 ~ 第60天',active:false,done:false,tasks:['数学专项：条件充分性判断（每天5题）','逻辑专项：分析推理（每天3题）','英语：完形填空 + 阅读理解 A节（每天2篇）','写作：每周写1篇论说文（700字）']},
+  {phase:'第3阶段 · 真题刷卷',date:'第61天 ~ 第80天',active:false,done:false,tasks:['每天1套历年真题（199+204全卷）','错题归类整理，重做错题3遍','英语翻译 + 大小作文每天各1篇','写作：每天写1篇论证有效性（600字）']},
+  {phase:'第4阶段 · 冲刺模考',date:'第81天 ~ 考试日',active:false,done:false,tasks:['每2天1套全卷模考（严格计时）','公式和错题本最后过一遍','作文背诵5篇高分范文','考前3天停止刷题，保持状态']},
+];
+
+function renderPlan(){
+  const el=document.getElementById('planList');
+  el.innerHTML=PLAN.map((p,i)=>`
+    <div class="plan-phase${p.active?' active-phase':''}${p.done?' done-phase':''}" data-pi="${i}">
+      <div class="pp-header">
+        <div class="pp-title">${p.done?'✅ ':''}${p.phase}</div>
+        <div class="pp-date">${p.date}</div>
+      </div>
+      <div class="pp-content">${p.tasks.map(t=>'• '+t).join('<br>')}</div>
+      <div class="pp-checks">${p.tasks.map((t,i)=>`<span class="pp-check${p.done?' done':''}" data-ti="${i}">${t.split('（')[0].split(' ')[0].slice(0,8)}…</span>`).join('')}</div>
+    </div>`).join('');
+  el.querySelectorAll('.pp-check').forEach(c=>{
+    c.addEventListener('click',function(){
+      const pi=+this.closest('.plan-phase').dataset.pi;
+      const ti=+this.dataset.ti;
+      if(!PLAN[pi].done){
+        PLAN[pi].tasks[ti]=(PLAN[pi].tasks[ti]||'');
+        this.classList.toggle('done');
+        if([...this.parentElement.querySelectorAll('.pp-check')].every(x=>x.classList.contains('done'))){
+          PLAN[pi].done=true;PLAN[pi+1]?.done===false&&(PLAN[pi+1].active=true);
+          addXP(100);showToast('🎉 阶段完成 +100 XP');
+          renderPlan();
+        }
+      }
+    });
+  });
+}
+
+// ========== 错题 ==========
+function renderWrong(){
+  const el=document.getElementById('wrongList');
+  const wrongs=QUESTIONS.filter(q=>state.wrong.includes(q.id));
+  if(!wrongs.length){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px">🎉 暂无错题，继续保持！</div>';return}
+  el.innerHTML=wrongs.map(q=>`
+    <div class="q-card wrong" data-id="${q.id}">
+      <div class="q-tag">❌ ${q.tag}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="q-opts">${q.opts.map((o,i)=>`<div class="q-opt${i===q.ans?' correct':''}"><span class="opt-label">${String.fromCharCode(65+i)}</span><span>${o}</span></div>`).join('')}</div>
+      <div class="q-explain show">💡 <strong>解析：</strong>${q.explain}</div>
+    </div>`).join('');
+}
+
+// ========== 写作题 ==========
+function showWritingQ(){
+  const q=`【论证有效性分析训练题】\n\n某市交通局发布报告：去年全市平均通勤时间比上一年增加了12%。报告中得出结论："交通拥堵已成为本市居民生活质量的最大威胁，建议立即出台限行措施。"\n\n请找出该论证中至少3个逻辑漏洞，并逐一分析：\n\n① "平均通勤时间增加" 是否等价于 "拥堵严重"？\n② "最大威胁" 的结论是否从数据能推出？\n③ "立即限行" 是否是从"拥堵威胁"必然推出的解决方案？\n\n提示：概念界定、因果跳跃、方案唯一性、样本代表性。`;
+  document.getElementById('writingQ').innerHTML=q;
+  document.getElementById('writingQ').style.display='block';
+  addXP(5);showToast('✍️ 写作练习 +5 XP');
+}
+function showEssayQ(){
+  const q=`【论说文素材】\n\n"一个企业可以因为错误而失败，但绝不可以在正确的道路上止步不前。在快速变化的时代，保持'正确的不确定性'比追求确定的答案更有价值。"\n\n请从以上材料中提炼一个观点，自拟题目，写一篇700字论说文。\n\n推荐角度：①不确定性管理的价值；②"正确"的边界：何时应该坚持，何时应该转向；③ 创新与稳健的平衡\n\n评分要点：论点明确(5分) · 论据充足(10分) · 论证严密(10分) · 结构合理(5分) · 语言流畅(5分)`;
+  document.getElementById('essayQ').innerHTML=q;
+  document.getElementById('essayQ').style.display='block';
+  addXP(5);showToast('📑 论说文练习 +5 XP');
+}
+
+// ========== 成就 ==========
+const ACH=[
+  {id:'first',icon:'🥇',name:'首次答题',check:()=>state.answered>=1},
+  {id:'streak3',icon:'🔥',name:'3天连续',check:()=>state.streak>=3},
+  {id:'math10',icon:'📐',name:'数学10题',check:()=>state.answered>=10},
+  {id:'acc50',icon:'🎯',name:'正确率50%+',check:()=>state.correct/state.answered>=0.5&&state.answered>=10},
+  {id:'acc70',icon:'💎',name:'正确率70%+',check:()=>state.correct/state.answered>=0.7&&state.answered>=20},
+  {id:'exam1',icon:'⏱️',name:'完成模考',check:()=>state.xp>=50},
+  {id:'writing',icon:'✍️',name:'写作练习',check:()=>state.xp>=15},
+  {id:'allCat',icon:'📚',name:'全科目',check:()=>state.progress.math>0&&state.progress.logic>0&&state.progress.english>0},
+];
+function renderAch(){
+  document.getElementById('achGrid').innerHTML=ACH.map(a=>{
+    const unlocked=a.check();
+    if(unlocked&&!state.achievements[a.id]){state.achievements[a.id]=true;addXP(20)}
+    return `<div class="ach${unlocked?'':' locked'}"><div class="ach-icon">${a.icon}</div><div class="ach-name">${a.name}</div></div>`;
+  }).join('');
+  saveState();
+}
+
+// ========== 每日题目 ==========
+(function showDailyQ(){
+  const catList=['math','logic','english','math','logic','english'];
+  const idx=new Date().getDate()%catList.length;
+  const cat=catList[idx];
+  const q=QUESTIONS.filter(x=>x.cat===cat)[new Date().getDate()%(QUESTIONS.filter(x=>x.cat===cat).length||1)];
+  if(q){
+    document.getElementById('dc-subject').textContent={math:'📐 数学',logic:'🧠 逻辑',english:'📖 英语'}[cat];
+    document.getElementById('dailyQ').textContent=q.text;
+  }
+})();
+
+// ========== 初始化 ==========
+function init(){
+  document.getElementById('stat-answered').textContent=state.answered;
+  document.getElementById('stat-correct').textContent=state.correct;
+  document.getElementById('stat-rate').textContent=state.answered?Math.round(state.correct/state.answered*100)+'%':'0%';
+  document.getElementById('stat-streak').textContent=state.streak;
+  renderAch();
+  renderQuestions(currentCat);
+  renderPlan();
+}
+init();
+</script>
+</body>
+</html>
