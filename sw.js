@@ -1,5 +1,5 @@
-const CACHE="mba2026-v2";
-const ASSETS=["index.html","manifest.json"];
+const CACHE="mba2026-v3";
+const ASSETS=["index.html","manifest.json","img/hero.webp","img/math.webp","img/logic.webp","img/writing.webp","img/english.webp","img/campus.webp","img/vocab.webp","img/plan.webp"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",e=>{
